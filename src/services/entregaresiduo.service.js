@@ -8,8 +8,10 @@ const registrarEntrega = async ({ usuarioId, ecopuntoId, tipoResiduoId, pesoKg }
   const tipo = await tipoRepo.buscarPorId(tipoResiduoId);
   if (!tipo) throw new Error('Tipo de residuo no encontrado');
 
-  const tokens = Math.round(tipo.tokensPorKg * pesoKg);
-  console.log(`🧮 Tokens otorgados: ${tokens} (${tipo.tokensPorKg} x ${pesoKg})`);
+  // Redondeo especial: 0.5kg o más es 1kg, menos de 0.5 es 0
+  const pesoRedondeado = pesoKg >= 0.5 ? 1 : 0;
+  const tokens = Math.round(tipo.tokensPorKg * pesoRedondeado);
+  console.log(`🧮 Tokens otorgados: ${tokens} (${tipo.tokensPorKg} x ${pesoRedondeado})`);
 
   const entrega = await entregaRepo.crearEntrega({
     usuario: usuarioId,

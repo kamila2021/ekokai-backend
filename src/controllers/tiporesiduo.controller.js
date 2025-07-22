@@ -1,4 +1,5 @@
 const tipoService = require('../services/tiporesiduo.service');
+const tipoRepo = require('../repositories/tiporesiduo.repository');
 
 const crear = async (req, res) => {
   try {
@@ -23,10 +24,9 @@ const listar = async (req, res) => {
 
 const eliminar = async (req, res) => {
   try {
-    const { id } = req.params;
-    console.log('🗑️ [CONTROLLER] → DELETE /tipos-residuo/' + id);
-    await tipoService.eliminarTipoResiduo(id);
-    res.json({ mensaje: 'Tipo de residuo eliminado' });
+    console.log('🗑️ [CONTROLLER] → DELETE /tipos-residuo/' + req.params.id);
+    await tipoRepo.eliminarTipoResiduo(req.params.id);
+    res.status(200).json({ mensaje: 'Tipo de residuo eliminado' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

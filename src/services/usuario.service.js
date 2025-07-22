@@ -62,11 +62,21 @@ const eliminarUsuario = async (id) => {
   return await usuarioRepo.eliminarUsuario(id);
 };
 
+const listarAdministradores = async () => {
+  return await usuarioRepo.listarAdministradores();
+};
+
+const buscarAdministradorPorId = async (id) => {
+  return await usuarioRepo.buscarAdministradorPorId(id);
+};
+
 module.exports = {
   registrarVecino,
   obtenerTodos,
   obtenerPorId,
   registrarConRol,
   actualizarUsuario,
-  eliminarUsuario
+  eliminarUsuario,
+  listarAdministradores,
+  buscarAdministradorPorId
 };

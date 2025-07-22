@@ -1,27 +1,34 @@
-const { detectIntentFromMessage } = require('../services/dialogflow.service');
+require('dotenv').config();
+const dialogflow = require('@google-cloud/dialogflow');
 
-async function webhookWhatsApp(req, res) {
-  const { mensaje, telefono } = req.body; // ajusta según lo que envías desde WhatsApp
+// Opcional: debug
+console.log('🔑 Usando credenciales GCP desde:', process.env.GOOGLE_APPLICATION_CREDENTIALS);
+
+const sessionClient = new dialogflow.SessionsClient(); // usará GOOGLE_APPLICATION_CREDENTIALS automáticamente
+
+async function detectarIntent(mensaje, sessionId = 'default-session') {
+  const projectId = 'ekokai'; // tu project_id
+  const sessionPath = sessionClient.projectAgentSessionPath(projectId, sessionId);
+
+  const request = {
+    session: sessionPath,
+    queryInput: {
+      text: {
+        text: mensaje,
+        languageCode: 'es', // idioma
+      },
+    },
+  };
 
   try {
-    const respuestaBot = await detectIntentFromMessage(mensaje, telefono);
-    
-    // Aquí puedes devolver respuesta al frontend o a Twilio/360Dialog/etc.
-    console.log('🤖 Respuesta generada:', respuestaBot);
-
-    res.status(200).json({
-      success: true,
-      respuesta: respuestaBot,
-    });
-
-  } catch (error) {
-    console.error('🚨 Error en webhook WhatsApp:', error.message);
-
-    res.status(500).json({
-      success: false,
-      mensaje: 'Error procesando mensaje. Intente más tarde.',
-    });
+    const responses = await sessionClient.detectIntent(request);
+    const result = responses[0].queryResult;
+    console.log('✅ Respuesta de Dialogflow:', result.fulfillmentText);
+    return result.fulfillmentText;
+  } catch (err) {
+    console.error('❌ Error al consultar Dialogflow:', err);
+    throw err;
   }
 }
-module.exports = { webhookWhatsApp };
 
+module.exports = { detectarIntent };

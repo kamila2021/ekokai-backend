@@ -4,17 +4,21 @@ const usuarioRepo = require('../repositories/usuario.repository');
 const ecopuntoRepo = require('../repositories/ecopunto.repository')
 const usuarioService = require('../services/usuario.service')
 // Admin registra encargado
-
 const registrarConRol = async (req, res) => {
-  console.log('🟢 [CONTROLLER] Solicitud para registrar encargado recibida');
+  console.log('🟢 [CONTROLLER] Solicitud para registrar usuario con rol recibida');
   console.log('📥 [CONTROLLER] Body recibido:', req.body);
 
   try {
-    const { usuario, accessTokenTemporal } = await usuarioService.registrarConRol(req.body, 'encargado');
-    console.log('✅ [CONTROLLER] Encargado creado con éxito:', usuario.email);
-    res.status(201).json({ mensaje: 'Encargado creado', usuario, accessTokenTemporal });
+    const { rol } = req.body;
+    if (!rol || !['encargado', 'administrador'].includes(rol)) {
+      return res.status(400).json({ error: 'Rol inválido. Usa "encargado" o "administrador".' });
+    }
+
+    const { usuario, accessTokenTemporal } = await usuarioService.registrarConRol(req.body, rol);
+    console.log(`✅ [CONTROLLER] Usuario con rol ${rol} creado con éxito:`, usuario.email);
+    res.status(201).json({ mensaje: `Usuario con rol ${rol} creado`, usuario, accessTokenTemporal });
   } catch (err) {
-    console.error('❌ [CONTROLLER] Error al crear encargado:', err.message);
+    console.error('❌ [CONTROLLER] Error al registrar usuario con rol:', err.message);
     res.status(400).json({ error: err.message });
   }
 };
@@ -106,11 +110,32 @@ const eliminarUsuario = async (req, res) => {
   }
 };
 
+const listarAdministradores = async (req, res) => {
+  try {
+    const administradores = await usuarioService.listarAdministradores();
+    res.json(administradores);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const obtenerAdministrador = async (req, res) => {
+  try {
+    const admin = await usuarioService.buscarAdministradorPorId(req.params.id);
+    if (!admin) return res.status(404).json({ error: 'Administrador no encontrado' });
+    res.json(admin);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   registrarVecino,
   listarUsuarios,
   obtenerUsuario,
   registrarConRol,
   actualizarUsuario,
-  eliminarUsuario
+  eliminarUsuario,
+  listarAdministradores,
+  obtenerAdministrador
 };

@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { getDB1 } = require('../config/database');
 
 const EntregaResiduoSchema = new mongoose.Schema({
   usuario: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario', required: true },
@@ -10,4 +9,6 @@ const EntregaResiduoSchema = new mongoose.Schema({
   fecha: { type: Date, default: Date.now }
 });
 
-module.exports = getDB1().model('EntregaResiduo', EntregaResiduoSchema, 'entregas');
+module.exports = (connection) => {
+  return connection.models.EntregaResiduo || connection.model('EntregaResiduo', EntregaResiduoSchema, 'entregas');
+};

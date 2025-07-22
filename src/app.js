@@ -42,5 +42,6 @@ app.use('/tipos-residuo', checkRoute('/tipos-residuo', './routes/tiporesiduo.rou
 app.use('/estadisticas', checkRoute('/estadisticas', './routes/estadisticas.routes'));
 app.use('/webhook', checkRoute('/webhook', './routes/whatsapp.routes'));
 app.use('/admin', checkRoute('/admin', './routes/admin.routes'));
+app.use('/cupones', checkRoute('/cupones', './routes/cupon.routes'));
 
 module.exports = app;
